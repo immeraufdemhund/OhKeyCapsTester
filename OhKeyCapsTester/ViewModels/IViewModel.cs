@@ -12,7 +12,34 @@ namespace OhKeyCapsTester.ViewModels
     {
     }
 
-    public class ViewModelBase : INotifyPropertyChanged, IViewModel
+    public abstract class NotifyPropertyChanged: INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected bool Set<T>(ref T field,
+            T newValue = default,
+            [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                return false;
+            }
+
+            var oldValue = field;
+            field = newValue;
+
+            RaisePropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+    }
+
+    public class ViewModelBase : NotifyPropertyChanged, IViewModel
     {
         private static bool? _isInDesignMode;
 
@@ -46,29 +73,5 @@ namespace OhKeyCapsTester.ViewModels
         }
 
         protected IMessageBus MessageBus { get; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected bool Set<T>(ref T field,
-            T newValue = default,
-            [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, newValue))
-            {
-                return false;
-            }
-
-            var oldValue = field;
-            field = newValue;
-
-            RaisePropertyChanged(propertyName);
-
-            return true;
-        }
-
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

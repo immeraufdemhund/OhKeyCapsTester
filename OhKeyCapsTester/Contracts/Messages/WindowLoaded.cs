@@ -3,4 +3,8 @@
     public class WindowLoaded
     {
     }
+
+    public class WindowClosing
+    {
+    }
 }

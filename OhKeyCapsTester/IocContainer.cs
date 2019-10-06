@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using Autofac;
 using Autofac.Extras.CommonServiceLocator;
 using CommonServiceLocator;
+using OhKeyCapsTester.Contracts;
 using OhKeyCapsTester.MessageBusService;
 using OhKeyCapsTester.ViewModels;
 
@@ -26,6 +27,10 @@ namespace OhKeyCapsTester
                 .Where(t => typeof(IViewModel).IsAssignableFrom(t))
                 .AsImplementedInterfaces();
 
+            builder.RegisterAssemblyTypes(assemblies)
+                .Where(t => typeof(IService).IsAssignableFrom(t))
+                .AsImplementedInterfaces();
+
             BaseContainer = builder.Build();
         }
 
@@ -33,7 +38,7 @@ namespace OhKeyCapsTester
         {
             Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal, action);
         }
-        
+
         internal static void CleanUp()
         {
             using (BaseContainer) { }

@@ -63,11 +63,24 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Contracts\IMainWindow.cs" />
+    <Compile Include="Contracts\IService.cs" />
+    <Compile Include="Contracts\Messages\DeviceFound.cs" />
+    <Compile Include="Contracts\Messages\KeyEvent.cs" />
     <Compile Include="Contracts\Messages\WindowLoaded.cs" />
+    <Compile Include="Core\Hid\HidNative.cs" />
+    <Compile Include="Core\Hid\HidWatcher.cs" />
+    <Compile Include="Core\Hid\Structs.cs" />
+    <Compile Include="Core\KeyStateColorConverter.cs" />
     <Compile Include="ViewModels\CommandHandler.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="Views\KeyStats.xaml.cs">
+      <DependentUpon>KeyStats.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Manuform4x5.xaml.cs">
+      <DependentUpon>Manuform4x5.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -81,6 +94,8 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\KeyStats.xaml" />
+    <Page Include="Views\Manuform4x5.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MessageBusService\Extensions.cs" />
@@ -104,9 +119,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
