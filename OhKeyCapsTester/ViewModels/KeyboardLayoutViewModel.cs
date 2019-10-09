@@ -41,9 +41,8 @@ namespace OhKeyCapsTester.ViewModels
                 var keyPressedEvent = new KeyPressedEvent(keyName);
                 if (layout.ContainsKey(keyName))
                 {
-                    //TODO replace 60 with a value converter
-                    keyPressedEvent.X = layout[keyName].X * 60;
-                    keyPressedEvent.Y = layout[keyName].Y * 60;
+                    keyPressedEvent.X = layout[keyName].X;
+                    keyPressedEvent.Y = layout[keyName].Y;
                     keyPressedEvent.IsUsed = true;
                     dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => UsedKeys.Add(keyPressedEvent)));
                 }

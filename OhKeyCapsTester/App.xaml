@@ -12,6 +12,7 @@
     <Application.Resources>
          <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True"/>
          <c:KeyStateColorConverter x:Key="KeyStateColorConverter"/>
+         <c:KeySizeConverter SizeOfKey="60" x:Key="KeySizeConverter"/>
          <DataTemplate DataType="{x:Type models:KeyPressedEvent}">
              <v:KeyStats/>
          </DataTemplate>
