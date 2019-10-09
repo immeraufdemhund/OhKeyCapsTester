@@ -56,7 +56,7 @@ namespace OhKeyCapsTester.ViewModels
             NotUsedKeys = new ObservableKeyedCollection<string, KeyPressedEvent>(e => e.KeyName);
         }
 
-        public int Rows => 12;
+        public int Rows => 14;
         public int Cols => 6;
         public ObservableKeyedCollection<string, KeyPressedEvent> Events { get => _events; set => Set(ref _events, value); }
         public ObservableKeyedCollection<string, KeyPressedEvent> NotUsedKeys { get => _notUsedKeys; set => Set(ref _notUsedKeys, value); }
@@ -93,7 +93,7 @@ namespace OhKeyCapsTester.ViewModels
         private void SetEvents()
         {
             var layouts = _keyboardReaderService.LoadKeyboardLayouts().ToList();
-            var manuform = layouts.Single(x => x.KeyboardName == "Dactyl Manuform 4x5");
+            var manuform = layouts.Single(x => x.KeyboardName == "Dactyl Manuform 6x6");
             var layout = manuform.Layouts.Layout[0].Layout.ToDictionary(x => x.Label);
             var dispatcher = Application.Current.Dispatcher;
             for(var r = 0; r < Rows; r++)
