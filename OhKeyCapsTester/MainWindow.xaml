@@ -51,6 +51,5 @@
                 </Style>
             </ItemsControl.ItemContainerStyle>
         </ItemsControl>
-        <!-- <v:Manuform4x5 DataContext="{Binding Events}"/> -->
     </DockPanel>
 </Window>
