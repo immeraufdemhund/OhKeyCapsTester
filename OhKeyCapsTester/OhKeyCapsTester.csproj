@@ -85,9 +85,14 @@
     <Compile Include="Tests\Core\KeyboardReaderServiceTests.cs" />
     <Compile Include="ViewModels\CommandHandler.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
+    <Compile Include="ViewModels\KeyboardLayoutViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\Models\KeyPressedEvent.cs" />
     <Compile Include="ViewModels\ObservableKeyedCollection.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="Views\KeyboardLayoutView.xaml.cs">
+      <DependentUpon>KeyboardLayoutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\KeyStats.xaml.cs">
       <DependentUpon>KeyStats.xaml</DependentUpon>
     </Compile>
@@ -104,6 +109,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\KeyboardLayoutView.xaml" />
     <Page Include="Views\KeyStats.xaml" />
   </ItemGroup>
   <ItemGroup>

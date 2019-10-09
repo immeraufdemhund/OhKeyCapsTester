@@ -6,12 +6,13 @@
              xmlns:c="clr-namespace:OhKeyCapsTester.Core"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:OhKeyCapsTester.ViewModels.Models"
              d1p1:Ignorable="d"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True"/>
          <c:KeyStateColorConverter x:Key="KeyStateColorConverter"/>
-         <DataTemplate DataType="{x:Type vm:KeyPressedEvent}">
+         <DataTemplate DataType="{x:Type models:KeyPressedEvent}">
              <v:KeyStats/>
          </DataTemplate>
     </Application.Resources>
