@@ -8,6 +8,7 @@ namespace OhKeyCapsTester.Contracts
         string State { get; set; }
         int Rows { get; }
         int Cols { get; }
-        IDictionary<string, KeyPressedEvent> Events { get; }
+        ObservableKeyedCollection<string, KeyPressedEvent> Events { get; }
+        ObservableKeyedCollection<string, KeyPressedEvent> NotUsedKeys { get; }
     }
 }

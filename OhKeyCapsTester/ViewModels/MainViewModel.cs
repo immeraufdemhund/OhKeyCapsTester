@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using OhKeyCapsTester.Contracts;
 using OhKeyCapsTester.Contracts.Messages;
 using OhKeyCapsTester.Core;
@@ -15,53 +17,50 @@ namespace OhKeyCapsTester.ViewModels
     {
         private int? _pressed;
         private int _pressedCount;
+        private int _x;
+        private int _y;
 
-        public KeyPressedEvent(string keyName, int index)
+        public KeyPressedEvent(string keyName)
         {
             KeyName = keyName;
-            Index = index;
         }
 
-        public int? Pressed
-        {
-            get => _pressed;
-            set => Set(ref _pressed, value);
-        }
+        public int? Pressed { get => _pressed; set => Set(ref _pressed, value); }
 
-        public int PressedCount
-        {
-            get => _pressedCount;
-            set => Set(ref _pressedCount, value);
-        }
+        public int PressedCount { get => _pressedCount; set => Set(ref _pressedCount, value); }
         public string KeyName { get; }
-        public int Index { get; }
+        public bool IsUsed { get; set; }
+
+        public int X { get => _x; set => Set(ref _x, value); }
+        public int Y { get => _y; set => Set(ref _y, value); }
     }
     public class MainViewModel : ViewModelBase, IMainWindow, IHandle<WindowLoaded>, IHandle<WindowClosing>, IHandle<KeyEvent>, IHandle<DeviceFound>
     {
-        public int Rows => 10;
-        public int Cols => 5;
+        private const int SizeOffset = 60; // probably not the right place for this... but i dont know how to multiply in mvvm
+        private string _state;
+        private CancellationTokenSource _cancellationTokenSource;
+        private ObservableKeyedCollection<string, KeyPressedEvent> _events;
+        private ObservableKeyedCollection<string, KeyPressedEvent> _notUsedKeys;
+
         private readonly Lazy<int> HalfRows;
         private readonly IHidWatcher _hidWatcher;
-        private string _state;
-        public IDictionary<string, KeyPressedEvent> Events { get; }
-        public string State { get => _state; set => Set(ref _state, value); }
+        private readonly IKeyboardReaderService _keyboardReaderService;
 
-        private CancellationTokenSource _cancellationTokenSource;
-
-        public MainViewModel(IMessageBus messageBus, IHidWatcher hidWatcher) : base(messageBus)
+        public MainViewModel(IMessageBus messageBus, IHidWatcher hidWatcher, IKeyboardReaderService keyboardReaderService) : base(messageBus)
         {
             HalfRows = new Lazy<int>(() => Rows/2);
             _hidWatcher = hidWatcher;
+            _keyboardReaderService = keyboardReaderService;
             MessageBus.Subscribe(this);
-            var pressedEvents = new List<KeyPressedEvent>();
-            for(var r = 0; r < Rows; r++)
-            for (var c = 0; c < Cols; c++)
-            {
-                var keyName = CreateKeyName(r, c);
-                pressedEvents.Add(new KeyPressedEvent(keyName, pressedEvents.Count));
-            }
-            Events = pressedEvents.ToDictionary(x => x.KeyName);
+            Events = new ObservableKeyedCollection<string, KeyPressedEvent>(e => e.KeyName);
+            NotUsedKeys = new ObservableKeyedCollection<string, KeyPressedEvent>(e => e.KeyName);
         }
+
+        public int Rows => 12;
+        public int Cols => 6;
+        public ObservableKeyedCollection<string, KeyPressedEvent> Events { get => _events; set => Set(ref _events, value); }
+        public ObservableKeyedCollection<string, KeyPressedEvent> NotUsedKeys { get => _notUsedKeys; set => Set(ref _notUsedKeys, value); }
+        public string State { get => _state; set => Set(ref _state, value); }
 
         private string CreateKeyName(int r, int c)
         {
@@ -74,11 +73,49 @@ namespace OhKeyCapsTester.ViewModels
 
         public void Handle(WindowLoaded message)
         {
-            State = "Loaded";
+            State = "Shown";
             _cancellationTokenSource = new CancellationTokenSource();
             Task.Run(() => _hidWatcher.Watch(_cancellationTokenSource.Token));
+            Task.Run(() =>
+            {
+                try
+                {
+                    SetEvents();
+                    State = "Loaded";
+                }
+                catch (Exception e)
+                {
+                    State = e.ToString();
+                }
+            });
         }
 
+        private void SetEvents()
+        {
+            var layouts = _keyboardReaderService.LoadKeyboardLayouts().ToList();
+            var manuform = layouts.Single(x => x.KeyboardName == "Dactyl Manuform 4x5");
+            var layout = manuform.Layouts.Layout[0].Layout.ToDictionary(x => x.Label);
+            var dispatcher = Application.Current.Dispatcher;
+            for(var r = 0; r < Rows; r++)
+            for (var c = 0; c < Cols; c++)
+            {
+                var keyName = CreateKeyName(r, c);
+                var keyPressedEvent = new KeyPressedEvent(keyName);
+                if (layout.ContainsKey(keyName))
+                {
+                    keyPressedEvent.X = layout[keyName].X * SizeOffset;
+                    keyPressedEvent.Y = layout[keyName].Y * SizeOffset;
+                    keyPressedEvent.IsUsed = true;
+                    dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => Events.Add(keyPressedEvent)));
+                }
+                else
+                {
+                    dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => NotUsedKeys.Add(keyPressedEvent)));
+                }
+            }
+            RaisePropertyChanged(nameof(Events));
+            RaisePropertyChanged(nameof(NotUsedKeys));
+        }
         public void Handle(WindowClosing message)
         {
             _cancellationTokenSource.Cancel();

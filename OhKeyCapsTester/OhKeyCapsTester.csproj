@@ -86,6 +86,7 @@
     <Compile Include="ViewModels\CommandHandler.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ObservableKeyedCollection.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\KeyStats.xaml.cs">
       <DependentUpon>KeyStats.xaml</DependentUpon>
