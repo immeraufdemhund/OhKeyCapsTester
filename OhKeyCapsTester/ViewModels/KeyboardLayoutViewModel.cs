@@ -20,8 +20,8 @@ namespace OhKeyCapsTester.ViewModels
             UsedKeys = new ObservableKeyedCollection<string, KeyPressedEvent>(e => e.KeyName);
             NotUsedKeys = new ObservableKeyedCollection<string, KeyPressedEvent>(e => e.KeyName);
         }
-        public int Rows => 14;
-        public int Cols => 6;
+        public int Rows { get; private set; }
+        public int Cols { get; private set; }
         public ObservableKeyedCollection<string, KeyPressedEvent> UsedKeys { get; }
         public ObservableKeyedCollection<string, KeyPressedEvent> NotUsedKeys { get; }
 
@@ -29,6 +29,8 @@ namespace OhKeyCapsTester.ViewModels
         {
             var dispatcher = Application.Current.Dispatcher;
             if (dispatcher == null) return;
+            Rows = keyboardLayout.Rows;
+            Cols = keyboardLayout.Cols;
 
             var layout = keyboardLayout.Layouts.Layout[0].Layout.ToDictionary(x => x.Label);
             dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => UsedKeys.Clear()));
@@ -56,6 +58,7 @@ namespace OhKeyCapsTester.ViewModels
         public void Handle(KeyEvent message)
         {
             var index = CreateKeyName(message.Row, message.Col);
+            if (!UsedKeys.Contains(index)) return;
             UsedKeys[index].PressedCount += message.Pressed;
             UsedKeys[index].Pressed = message.Pressed;
         }

@@ -21,6 +21,8 @@ namespace OhKeyCapsTester.Core
             return new KeyboardLayout
             {
                 KeyboardName = j["keyboard_name"].Value<string>(),
+                Rows = j["rows"].Value<int>(),
+                Cols = j["cols"].Value<int>(),
                 Width = j["width"].Value<int>(),
                 Height = j["height"].Value<int>(),
                 Layouts = ParseKeyboardLayoutCollection(j["layouts"])
@@ -50,6 +52,7 @@ namespace OhKeyCapsTester.Core
             {
                 Label = x["label"].Value<string>(),
                 X = x["x"].Value<int>(),
+                H = x["h"]?.Value<int>() ?? 1,
                 Y = x["y"].Value<int>()
             }).ToArray();
         }

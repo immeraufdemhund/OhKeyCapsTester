@@ -5,39 +5,39 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using OhKeyCapsTester.Contracts;
 using OhKeyCapsTester.Contracts.Messages;
-using OhKeyCapsTester.Core;
 using OhKeyCapsTester.Core.Hid;
 using OhKeyCapsTester.MessageBusService;
-using OhKeyCapsTester.ViewModels.Models;
 
 namespace OhKeyCapsTester.ViewModels
 {
     public class MainViewModel : ViewModelBase, IMainWindow, IHandle<WindowLoaded>, IHandle<WindowClosing>, IHandle<DeviceFound>
     {
         private string _state;
-        private CancellationTokenSource _cancellationTokenSource;
 
-        private readonly IHidWatcher _hidWatcher;
         private readonly IKeyboardReaderService _keyboardReaderService;
         private Dictionary<string, KeyboardLayout> _layouts;
         private string _selectedKeyboardLayout;
 
         public MainViewModel(IMessageBus messageBus, IHidWatcher hidWatcher, IKeyboardReaderService keyboardReaderService, IKeyboardLayoutControl keyboardLayoutControl) : base(messageBus)
         {
-            _hidWatcher = hidWatcher;
+            Watcher = hidWatcher;
             _keyboardReaderService = keyboardReaderService;
             KeyboardLayoutControl = keyboardLayoutControl;
             KeyboardLayouts = new ObservableCollection<string>();
             MessageBus.Subscribe(this);
+            RestartWatcherCommand = new CommandHandler(StartWatchingForKeyboardEvents, () => true);
         }
 
         public IKeyboardLayoutControl KeyboardLayoutControl { get; }
 
         public string State { get => _state; set => Set(ref _state, value); }
         public ICollection<string> KeyboardLayouts { get; }
+        public IHidWatcher Watcher { get; }
+        public ICommand RestartWatcherCommand { get; }
 
         public string SelectedKeyboardLayout
         {
@@ -49,11 +49,13 @@ namespace OhKeyCapsTester.ViewModels
             }
         }
 
+        private CancellationTokenSource TokenSource { get; set; }
+
+
         public void Handle(WindowLoaded message)
         {
             State = "Shown";
-            _cancellationTokenSource = new CancellationTokenSource();
-            Task.Run(() => _hidWatcher.Watch(_cancellationTokenSource.Token));
+            StartWatchingForKeyboardEvents();
             Task.Run(() =>
             {
                 try
@@ -66,6 +68,21 @@ namespace OhKeyCapsTester.ViewModels
                     State = e.ToString();
                 }
             });
+        }
+
+        private void StartWatchingForKeyboardEvents()
+        {
+            if (TokenSource == null)
+            {
+                TokenSource = new CancellationTokenSource();
+            }
+            else
+            {
+                TokenSource.Cancel();
+                TokenSource.Dispose();
+                TokenSource = new CancellationTokenSource();
+            }
+            Task.Run(() => Watcher.Watch(TokenSource.Token));
         }
 
         private void LoadKeyboardLayouts()
@@ -82,7 +99,7 @@ namespace OhKeyCapsTester.ViewModels
 
         public void Handle(WindowClosing message)
         {
-            _cancellationTokenSource.Cancel();
+            TokenSource.Cancel();
         }
 
         public void Handle(DeviceFound message)

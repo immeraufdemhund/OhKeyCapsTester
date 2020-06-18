@@ -4,6 +4,8 @@
     "maintainer": "qmk",
     "width": 17,
     "height": 8,
+    "rows": 12,
+    "cols": 7,
     "layouts": {
         "LAYOUT_5x7": {
             "layout": [

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework.Constraints;
 
 namespace OhKeyCapsTester.Contracts
 {
@@ -14,6 +13,8 @@ namespace OhKeyCapsTester.Contracts
         public int Width { get; set; }
         public int Height { get; set; }
         public KeyLayoutCollection Layouts { get; set; }
+        public int Rows { get; set; }
+        public int Cols { get; set; }
     }
 
     public struct KeyLayoutCollection
@@ -34,6 +35,12 @@ namespace OhKeyCapsTester.Contracts
     {
         public int X { get; set; }
         public int Y { get; set; }
+        public int H { get; set; }
         public string Label { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{nameof(Label)}: {Label}]{nameof(X)}: {X}, {nameof(Y)}: {Y}, {nameof(H)}: {H}";
+        }
     }
 }
